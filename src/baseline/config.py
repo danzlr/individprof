@@ -1,5 +1,5 @@
 """
-Configuration file for the NTO ML competition baseline.
+Configuration file for the NTO ML competition baseline (improved version).
 """
 
 from pathlib import Path
@@ -22,38 +22,47 @@ MODEL_DIR = OUTPUT_DIR / "models"
 SUBMISSION_DIR = OUTPUT_DIR / "submissions"
 
 
-# --- PARAMETERS ---
-N_SPLITS = 5  # Deprecated: kept for backwards compatibility, not used in temporal split
-RANDOM_STATE = 42
-TARGET = constants.COL_TARGET  # Alias for consistency
+# ============================================================
+# REQUIRED OLD VARS (чтобы train.py и predict.py работали)
+# ============================================================
 
-# --- TEMPORAL SPLIT CONFIG ---
-# Ratio of data to use for training (0 < TEMPORAL_SPLIT_RATIO < 1)
-# 0.8 means 80% of data points (by timestamp) go to train, 20% to validation
+EARLY_STOPPING_ROUNDS = 100
+MODEL_FILENAME = "lgb_model.txt"   # ← predict.py ищет это
+
+
+# ============================================================
+# GENERAL SETTINGS
+# ============================================================
+RANDOM_STATE = 42
+TARGET = constants.COL_TARGET
+
+# Temporal split ratio (80% train / 20% val)
 TEMPORAL_SPLIT_RATIO = 0.8
 
-# --- TRAINING CONFIG ---
-EARLY_STOPPING_ROUNDS = 50
-MODEL_FILENAME_PATTERN = "lgb_fold_{fold}.txt"  # Deprecated: kept for backwards compatibility
-MODEL_FILENAME = "lgb_model.txt"  # Single model filename for temporal split
 
-# --- TF-IDF PARAMETERS ---
-TFIDF_MAX_FEATURES = 500
+# ============================================================
+# TF-IDF SETTINGS (improved)
+# ============================================================
+TFIDF_MAX_FEATURES = 10000      # было 500 → качество сильно выше
 TFIDF_MIN_DF = 2
 TFIDF_MAX_DF = 0.95
 TFIDF_NGRAM_RANGE = (1, 2)
 
-# --- BERT PARAMETERS ---
+
+# ============================================================
+# BERT SETTINGS
+# ============================================================
 BERT_MODEL_NAME = constants.BERT_MODEL_NAME
 BERT_BATCH_SIZE = 8
 BERT_MAX_LENGTH = 512
 BERT_EMBEDDING_DIM = 768
 BERT_DEVICE = "cuda" if torch and torch.cuda.is_available() else "cpu"
-# Limit GPU memory usage to 50% to prevent overheating and OOM errors
 BERT_GPU_MEMORY_FRACTION = 0.75
 
 
-# --- FEATURES ---
+# ============================================================
+# CATEGORICAL FEATURES
+# ============================================================
 CAT_FEATURES = [
     constants.COL_USER_ID,
     constants.COL_BOOK_ID,
@@ -65,27 +74,34 @@ CAT_FEATURES = [
     constants.COL_PUBLISHER,
 ]
 
-# --- MODEL PARAMETERS ---
+
+# ============================================================
+# LIGHTGBM SETTINGS (improved)
+# ============================================================
 LGB_PARAMS = {
     "objective": "rmse",
     "metric": "rmse",
-    "n_estimators": 2000,
-    "learning_rate": 0.01,
-    "feature_fraction": 0.8,
+    "boosting_type": "gbdt",
+
+    "num_leaves": 63,            # лучше, чем 31
+    "learning_rate": 0.008,
+    "n_estimators": 3000,
+    "feature_fraction": 0.85,
     "bagging_fraction": 0.8,
     "bagging_freq": 1,
+
     "lambda_l1": 0.1,
-    "lambda_l2": 0.1,
-    "num_leaves": 31,
-    "verbose": -1,
-    "n_jobs": -1,
+    "lambda_l2": 0.2,
+    "min_child_samples": 20,
+
     "seed": RANDOM_STATE,
-    "boosting_type": "gbdt",
+    "n_jobs": -1,
+    "verbose": -1,
 }
 
-# LightGBM's fit method allows for a list of callbacks, including early stopping.
-# To use it, we need to specify parameters for the early stopping callback.
+from lightgbm import early_stopping
+
 LGB_FIT_PARAMS = {
     "eval_metric": "rmse",
-    "callbacks": [],  # Placeholder for early stopping callback
+    "callbacks": [early_stopping(EARLY_STOPPING_ROUNDS)],
 }
