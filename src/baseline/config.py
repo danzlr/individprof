@@ -1,5 +1,6 @@
 """
 Configuration file for the NTO ML competition baseline (improved version).
+Configuration file for the NTO ML competition baseline.
 """
 
 from pathlib import Path
@@ -12,6 +13,7 @@ except ImportError:
 from . import constants
 
 # --- DIRECTORIES ---
+#DIRECTORIES
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = ROOT_DIR / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
@@ -29,6 +31,8 @@ SUBMISSION_DIR = OUTPUT_DIR / "submissions"
 EARLY_STOPPING_ROUNDS = 100
 MODEL_FILENAME = "lgb_model.txt"   # ← predict.py ищет это
 
+EARLY_STOPPING_ROUNDS = 100
+MODEL_FILENAME = "lgb_model.txt"   # predict.py ищет это
 
 # ============================================================
 # GENERAL SETTINGS
@@ -44,6 +48,10 @@ TEMPORAL_SPLIT_RATIO = 0.8
 # TF-IDF SETTINGS (improved)
 # ============================================================
 TFIDF_MAX_FEATURES = 10000      # было 500 → качество сильно выше
+
+# TF-IDF SETTINGS
+
+TFIDF_MAX_FEATURES = 15000      # было 500 качество сильно выше
 TFIDF_MIN_DF = 2
 TFIDF_MAX_DF = 0.95
 TFIDF_NGRAM_RANGE = (1, 2)
@@ -63,6 +71,7 @@ BERT_GPU_MEMORY_FRACTION = 0.75
 # ============================================================
 # CATEGORICAL FEATURES
 # ============================================================
+
 CAT_FEATURES = [
     constants.COL_USER_ID,
     constants.COL_BOOK_ID,
@@ -78,12 +87,15 @@ CAT_FEATURES = [
 # ============================================================
 # LIGHTGBM SETTINGS (improved)
 # ============================================================
+
+# LIGHTGBM SETTINGS
 LGB_PARAMS = {
     "objective": "rmse",
     "metric": "rmse",
     "boosting_type": "gbdt",
 
     "num_leaves": 63,            # лучше, чем 31
+    "num_leaves": 70,            # лучше, чем 31
     "learning_rate": 0.008,
     "n_estimators": 3000,
     "feature_fraction": 0.85,
