@@ -1,5 +1,4 @@
 """
-Configuration file for the NTO ML competition baseline (improved version).
 Configuration file for the NTO ML competition baseline.
 """
 
@@ -12,7 +11,6 @@ except ImportError:
 
 from . import constants
 
-# --- DIRECTORIES ---
 #DIRECTORIES
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = ROOT_DIR / "data"
@@ -23,20 +21,13 @@ OUTPUT_DIR = ROOT_DIR / "output"
 MODEL_DIR = OUTPUT_DIR / "models"
 SUBMISSION_DIR = OUTPUT_DIR / "submissions"
 
-
-# ============================================================
 # REQUIRED OLD VARS (чтобы train.py и predict.py работали)
-# ============================================================
 
-EARLY_STOPPING_ROUNDS = 100
-MODEL_FILENAME = "lgb_model.txt"   # ← predict.py ищет это
 
 EARLY_STOPPING_ROUNDS = 100
 MODEL_FILENAME = "lgb_model.txt"   # predict.py ищет это
 
-# ============================================================
 # GENERAL SETTINGS
-# ============================================================
 RANDOM_STATE = 42
 TARGET = constants.COL_TARGET
 
@@ -44,22 +35,15 @@ TARGET = constants.COL_TARGET
 TEMPORAL_SPLIT_RATIO = 0.8
 
 
-# ============================================================
-# TF-IDF SETTINGS (improved)
-# ============================================================
-TFIDF_MAX_FEATURES = 10000      # было 500 → качество сильно выше
 
 # TF-IDF SETTINGS
 
-TFIDF_MAX_FEATURES = 15000      # было 500 качество сильно выше
+TFIDF_MAX_FEATURES = 10000      # было 500 качество сильно выше
 TFIDF_MIN_DF = 2
 TFIDF_MAX_DF = 0.95
 TFIDF_NGRAM_RANGE = (1, 2)
 
-
-# ============================================================
 # BERT SETTINGS
-# ============================================================
 BERT_MODEL_NAME = constants.BERT_MODEL_NAME
 BERT_BATCH_SIZE = 8
 BERT_MAX_LENGTH = 512
@@ -67,10 +51,7 @@ BERT_EMBEDDING_DIM = 768
 BERT_DEVICE = "cuda" if torch and torch.cuda.is_available() else "cpu"
 BERT_GPU_MEMORY_FRACTION = 0.75
 
-
-# ============================================================
 # CATEGORICAL FEATURES
-# ============================================================
 
 CAT_FEATURES = [
     constants.COL_USER_ID,
@@ -84,9 +65,6 @@ CAT_FEATURES = [
 ]
 
 
-# ============================================================
-# LIGHTGBM SETTINGS (improved)
-# ============================================================
 
 # LIGHTGBM SETTINGS
 LGB_PARAMS = {
@@ -95,7 +73,6 @@ LGB_PARAMS = {
     "boosting_type": "gbdt",
 
     "num_leaves": 63,            # лучше, чем 31
-    "num_leaves": 70,            # лучше, чем 31
     "learning_rate": 0.008,
     "n_estimators": 3000,
     "feature_fraction": 0.85,
